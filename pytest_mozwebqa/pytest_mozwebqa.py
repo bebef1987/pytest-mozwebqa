@@ -147,7 +147,19 @@ def pytest_funcarg__mozwebqa(request):
 def pytest_addoption(parser):
     config = ConfigParser.ConfigParser(defaults={
         'baseurl': '',
-        'api': 'webdriver'
+        'api': 'webdriver',
+        'host': 'localhost',
+        'port': '4444',
+        'driver': 'Remote',
+        'browsername': '',
+        'browserver': '',
+        'platform': '',
+        'webqatimeout': '60',
+        'capturenetwork': False,
+        'untrusted': False,
+        'sensitiveurl': 'mozilla\.(com|org)',
+        'destructive': False,
+        'webqareport': 'results/index.html'
     })
     config.read('mozwebqa.cfg')
 
@@ -165,19 +177,19 @@ def pytest_addoption(parser):
                      help="version of selenium api to use. 'rc' uses selenium rc. 'webdriver' uses selenium webdriver. (default: %default)")
     group._addoption('--host',
                      action='store',
-                     default='localhost',
+                     default=config.get('DEFAULT', 'host'),
                      metavar='str',
                      help='host that selenium server is listening on. (default: %default)')
     group._addoption('--port',
                      action='store',
                      type='int',
-                     default=4444,
+                     default=config.get('DEFAULT', 'port'),
                      metavar='num',
                      help='port that selenium server is listening on. (default: %default)')
     group._addoption('--driver',
                      action='store',
                      dest='driver',
-                     default='Remote',
+                     default=config.get('DEFAULT', 'driver'),
                      metavar='str',
                      help='webdriver implementation. (default: %default)')
     group._addoption('--capabilities',
@@ -233,27 +245,30 @@ def pytest_addoption(parser):
     group._addoption('--browsername',
                      action='store',
                      dest='browser_name',
+                     default=config.get('DEFAULT', 'browsername'),
                      metavar='str',
                      help='target browser name (webdriver).')
     group._addoption('--browserver',
                      action='store',
                      dest='browser_version',
+                     default=config.get('DEFAULT', 'browserver'),
                      metavar='str',
                      help='target browser version (webdriver).')
     group._addoption('--platform',
                      action='store',
+                     default=config.get('DEFAULT', 'platform'),
                      metavar='str',
                      help='target platform (webdriver).')
     group._addoption('--webqatimeout',
                      action='store',
                      type='int',
-                     default=60,
+                     default=config.get('DEFAULT', 'webqatimeout'),
                      metavar='num',
                      help='timeout (in seconds) for page loads, etc. (default: %default)')
     group._addoption('--capturenetwork',
                      action='store_true',
                      dest='capture_network',
-                     default=False,
+                     default=config.get('DEFAULT', 'capturenetwork'),
                      help='capture network traffic to test_method_name.json (selenium rc). (default: %default)')
     group._addoption('--build',
                      action='store',
@@ -263,20 +278,20 @@ def pytest_addoption(parser):
     group._addoption('--untrusted',
                      action='store_true',
                      dest='assume_untrusted',
-                     default=False,
+                     default=config.get('DEFAULT', 'untrusted'),
                      help='assume that all certificate issuers are untrusted. (default: %default)')
 
     group = parser.getgroup('safety', 'safety')
     group._addoption('--sensitiveurl',
                      action='store',
                      dest='sensitive_url',
-                     default='mozilla\.(com|org)',
+                     default=config.get('DEFAULT', 'sensitiveurl'),
                      metavar='str',
                      help='regular expression for identifying sensitive urls. (default: %default)')
     group._addoption('--destructive',
                      action='store_true',
                      dest='run_destructive',
-                     default=False,
+                     default=config.get('DEFAULT', 'destructive'),
                      help='include destructive tests (tests not explicitly marked as \'nondestructive\'). (default: %default)')
 
     group = parser.getgroup('credentials', 'credentials')
@@ -296,7 +311,7 @@ def pytest_addoption(parser):
                     action='store',
                     dest='webqa_report_path',
                     metavar='path',
-                    default='results/index.html',
+                    default=config.get('DEFAULT', 'webqareport'),
                     help='create mozilla webqa custom report file at given path. (default: %default)')
 
 
